@@ -1,7 +1,7 @@
 Extract:
-	 tar xvf os.tar.gz -C /home/jordan/Desktop/Programming/TeamOS/
+	 tar xvf os.tar.gz -C /home/'user'/Desktop/Programming/TeamOS/
 
-In the Operating System folder ("Named OS"), open the Terminal and type:
+In the Operating System folder ("OS"), open the Terminal and type:
 	make clean
 *new line*	
 	make
