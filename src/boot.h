@@ -21,17 +21,25 @@
 int nrp = 0; //no root password
 
 void checkFiles(){
-    FILE *file;
+    FILE* file;
+    DIR* dir = opendir("root");
+    struct stat sb;
     int result;
 
-    if ((file = fopen("usrs", "r"))){
+    if ((file = fopen("usrs", "r"))){ //checking if "usrs" file exists
+      printf(KGRN"[DEBUG]:"KNRM" usrs exists\n");
       fclose(file);
     }
-    else nrp = 1;
+    else nrp = 1; //if not thenno root password = 1
 
-    if((result = mkdir("root", 0777)) == -1){
-      printf("Error: couldn't make directory\n\n");
-      exit(-1);
+    if (stat("root", &sb) == 0 && S_ISDIR(sb.st_mode)){
+        printf(KGRN"[DEBUG]"KNRM" root exists\n");
+    }
+    else{
+      if((result = mkdir("root", 0777)) == -1){
+        printf(KRED"Error: couldn't make directory\n\n"KNRM);
+        exit(1);
+      }
     }
 }
 
@@ -41,8 +49,8 @@ void inrp(int nrp){ //inrp = if no root password
     char* rpass = malloc(sizeof(char) * 261); //root password
     char* tmp = malloc(sizeof(char) * 261); //temporary string
 
-    printf(KRED"The \"usrs\" file does not exist! (no user has been implemented into the system.)\n\n");
-    printf(KNRM"Please enter root password that you want: "); scanf("%s", rpass);
+    printf(KRED"The \"usrs\" file does not exist! (no user has been implemented into the system.)\n\n"KNRM);
+    printf("Please enter root password that you want: "); scanf("%s", rpass);
     printf(KGRN"[DEBUG]:"KNRM" pass is \"%s\"\n", rpass);
 
     strcpy(tmp, "root "); //make tmp = "root "
