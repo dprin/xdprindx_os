@@ -2,6 +2,7 @@
 This is an os that i will be working on in c only. I'll invite a friend to help me make it.
 
 **INSTRUCTIONS**
+
 Extract:
 	 git clone (git clone link)
 
@@ -20,4 +21,5 @@ Then type to run the operating system this command:
 gg.
 
 **ERRORS**
+
 *Over here will include all of the errors, just in case you got an error you can report it in issues so that we can investigate*
