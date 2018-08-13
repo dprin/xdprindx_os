@@ -20,21 +20,22 @@
 #include <sys/types.h>
 
 int nrp = 0; //no root password
+int isAdmin;
 
-void checkFiles(){
+void checkFiles(int debug){
     FILE* file;
     DIR* dir = opendir("root");
     struct stat sb;
     int result;
 
     if ((file = fopen("usrs", "r"))){ //checking if "usrs" file exists
-      printf(KGRN"[DEBUG]:"KNRM" usrs exists\n");
+      if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" usrs exists\n");
       fclose(file);
     }
     else nrp = 1; //if not thenno root password = 1
 
     if (stat("root", &sb) == 0 && S_ISDIR(sb.st_mode)){
-        printf(KGRN"[DEBUG]"KNRM" root exists\n");
+        if (debug == 1) printf(KGRN"[DEBUG]"KNRM" root exists\n");
     }
     else{
       if((result = mkdir("root", 0777)) == -1){
@@ -44,7 +45,7 @@ void checkFiles(){
     }
 }
 
-void inrp(int nrp){ //inrp = if no root password
+void inrp(int nrp, int debug){ //inrp = if no root password
   if (nrp == 1){ //skips all of this function if nrp == 0
     FILE *fp;
     char* rpass = malloc(sizeof(char) * 261); //root password
@@ -52,13 +53,13 @@ void inrp(int nrp){ //inrp = if no root password
 
     printf(KRED"The \"usrs\" file does not exist! (no user has been implemented into the system.)\n\n"KNRM);
     printf("Please enter root password that you want: "); scanf("%s", rpass);
-    printf(KGRN"[DEBUG]:"KNRM" pass is \"%s\"\n", rpass);
+    if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" pass is \"%s\"\n", rpass);
 
     strcpy(tmp, "root ");//make tmp = "root "
     strcat(tmp, rpass);//add everything in rpass to tmp
     strcat(tmp, " 1"); //add admin permissions to root
 
-    printf(KGRN"[DEBUG]:"KNRM" will print in file \"%s\"\n", tmp);
+    if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" will print in file \"%s\"\n", tmp);
 
     fp = fopen("usrs", "a");
     fprintf(fp, "%s\n", tmp);
@@ -69,18 +70,20 @@ void inrp(int nrp){ //inrp = if no root password
   }
 }
 
-//Compares the username entered with all of the usernames in "usrs" file
-int cUser(char* username, FILE* fp){
+//Compares the login information the user gave with "usrs" file
+int cLogin(char* username, char* password, FILE* fp, int debug){
   if (fp == NULL) return 0; //exit if nothing in file
 
   char* buff; //buffer
   char* tmp; //temporary
   char* un; //username
-  int c, i = 0, i1= 0; //c = character, i = increment
+  char* ps; //password
+  int c, i = 0, i1 = 0, i2 = 0; //c = character, i = increment
   size_t n = 0;
 
   tmp = malloc(sizeof(char) * 516);
-  un = malloc(sizeof(char) * 257);
+  un = malloc(sizeof(char) * 257); //it is 257 to add the '/0' at the end
+  ps = malloc(sizeof(char) * 257);
 
   //this finds how big the "usrs" file is
   fseek(fp, 0, SEEK_END);
@@ -107,16 +110,41 @@ int cUser(char* username, FILE* fp){
       c = (int) tmp[i1];
       un[i1++] = (char) c;
     }
-    un[i1] = '\0'; //end string
+    un[i1++] = '\0'; //end string
 
-
-    //if the username in file and the username inputed is equal then return 1
+    //if the username in file and the username inputed is equal then
+    //see if password isequal
     if ((strcmp(un,username)) == 0){
-      printf("\n");
-      free(buff);
-      free(tmp);
-      free(un);
-      return 1;
+      while (tmp[i1] != ' '){
+        c = (int) tmp[i1++];
+        ps[i2++] = (char) c;
+      }
+      ps[i2] = '\0';
+
+      if ((strcmp(ps, password)) == 0){
+        free(buff);
+        free(tmp);
+        free(un);
+        free(ps);
+        if (tmp[i1 + 1] == '1'){
+          if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"ADMIN \n");
+          isAdmin = 1;
+        }
+        else if (tmp[i1 + 1] == '0'){
+          if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"NOT ADMIN \n");
+          isAdmin = 0;
+        }
+
+        return 1;
+      }
+      else{
+        free(buff);
+        free(tmp);
+        free(un);
+        free(ps);
+
+        return 0;
+      }
     }
 
     //make the "increment"ers 0
@@ -124,40 +152,42 @@ int cUser(char* username, FILE* fp){
     i = 0;
   }
   //if nothing is equal to the username entered it will return 0
-  printf("\n");
-
   free(buff);
   free(tmp);
   free(un);
+  free(ps);
 
   return 0;
 }
 
-void login(){ //login function
+
+void login(int debug){ //login function
   FILE* fp;
   char* userI = malloc(sizeof(char) * 256); //username input (from user)
-  char* userF = malloc(sizeof(char) * 256); //username file (from "usrs" file)
   char* passI = malloc(sizeof(char) * 256); //password input (from user)
-  char* passF = malloc(sizeof(char) * 256); //password file (from "usrs" file)
-  int ret;
+  int ret = 0; //this is the variable that stores what the function cLogin returns
+  //same thing with retP but from cPass function
 
   fp = fopen("usrs", "r");
 
-  printf("Please enter your username: "); //ask for username
-  scanf("%s", userI); printf("\n");
+  while (ret == 0){
+      printf("Please enter your username: ");
+      scanf("%s", userI); printf("\n");
+      printf("Please enter your password: ");
+      scanf("%s", passI); printf("\n");
 
-  ret = cUser(userI, fp);
-
-  if (ret == 1) printf(KGRN"[DEBUG]: "KNRM"Username exists \n");
-  else if (ret == 0) printf(KGRN"[DEBUG]: "KNRM"Username doesn't exists \n");
+      ret = cLogin(userI, passI, fp, debug);
+      if (debug == 1 && ret == 0) printf(KGRN"[DEBUG]: "KNRM"Username/password doesn't exists \n");
+      else if (debug == 1 && ret == 1) printf(KGRN"[DEBUG]: "KNRM"Username and password exists \n");
+  }
 
   fclose(fp);
 }
 
-void boot(){
-  checkFiles();
-  inrp(nrp);
-  login();
+void boot(int debug){
+  checkFiles(debug);
+  inrp(nrp, debug);
+  login(debug);
 }
 
 #endif
