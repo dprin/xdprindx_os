@@ -21,6 +21,8 @@
 
 int nrp = 0; //no root password
 int isAdmin;
+char* directory;
+char* username;
 
 void checkFiles(int debug){
     FILE* file;
@@ -52,12 +54,14 @@ void inrp(int nrp, int debug){ //inrp = if no root password
     char* tmp = malloc(sizeof(char) * 261); //temporary string
 
     printf(KRED"The \"usrs\" file does not exist! (no user has been implemented into the system.)\n\n"KNRM);
-    printf("Please enter root password that you want: "); scanf("%s", rpass);
+    printf("Please enter root password that you want: "); fgets(rpass, 261, stdin);
+
+    rpass[strlen(rpass) - 1] = '\0'; //remove \n at the end of rpass
     if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" pass is \"%s\"\n", rpass);
 
-    strcpy(tmp, "root ");//make tmp = "root "
+    strcpy(tmp, "root:");//make tmp = "root "
     strcat(tmp, rpass);//add everything in rpass to tmp
-    strcat(tmp, " 1"); //add admin permissions to root
+    strcat(tmp, ":1"); //add admin permissions to root
 
     if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" will print in file \"%s\"\n", tmp);
 
@@ -71,7 +75,7 @@ void inrp(int nrp, int debug){ //inrp = if no root password
 }
 
 //Compares the login information the user gave with "usrs" file
-int cLogin(char* username, char* password, FILE* fp, int debug){
+int cLogin(char* usern, char* password, FILE* fp, int debug){
   if (fp == NULL) return 0; //exit if nothing in file
 
   char* buff; //buffer
@@ -106,7 +110,7 @@ int cLogin(char* username, char* password, FILE* fp, int debug){
     tmp[i] = '\0'; //end string
     n++; //increment n so that it doesn't loop forever
 
-    while (tmp[i1] != ' '){ //find the username in "usrs" file
+    while (tmp[i1] != ':'){ //find the username in "usrs" file
       c = (int) tmp[i1];
       un[i1++] = (char) c;
     }
@@ -114,18 +118,16 @@ int cLogin(char* username, char* password, FILE* fp, int debug){
 
     //if the username in file and the username inputed is equal then
     //see if password isequal
-    if ((strcmp(un,username)) == 0){
-      while (tmp[i1] != ' '){
+    if ((strcmp(un,usern)) == 0){
+      while (tmp[i1] != ':'){
         c = (int) tmp[i1++];
         ps[i2++] = (char) c;
       }
       ps[i2] = '\0';
 
       if ((strcmp(ps, password)) == 0){
-        free(buff);
-        free(tmp);
-        free(un);
-        free(ps);
+        strcpy(username, un);
+
         if (tmp[i1 + 1] == '1'){
           if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"ADMIN \n");
           isAdmin = 1;
@@ -134,6 +136,11 @@ int cLogin(char* username, char* password, FILE* fp, int debug){
           if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"NOT ADMIN \n");
           isAdmin = 0;
         }
+
+        free(buff);
+        free(tmp);
+        free(un);
+        free(ps);
 
         return 1;
       }
@@ -166,25 +173,34 @@ void login(int debug){ //login function
   char* userI = malloc(sizeof(char) * 256); //username input (from user)
   char* passI = malloc(sizeof(char) * 256); //password input (from user)
   int ret = 0; //this is the variable that stores what the function cLogin returns
-  //same thing with retP but from cPass function
 
   fp = fopen("usrs", "r");
 
   while (ret == 0){
       printf("Please enter your username: ");
-      scanf("%s", userI); printf("\n");
+      fgets(userI, 256, stdin);
       printf("Please enter your password: ");
-      scanf("%s", passI); printf("\n");
+      fgets(passI, 256, stdin);
+
+      userI[strlen(userI) - 1] = '\0'; //remove \n at end of string
+      passI[strlen(passI) - 1] = '\0'; //remove \n at end of string
 
       ret = cLogin(userI, passI, fp, debug);
       if (debug == 1 && ret == 0) printf(KGRN"[DEBUG]: "KNRM"Username/password doesn't exists \n");
       else if (debug == 1 && ret == 1) printf(KGRN"[DEBUG]: "KNRM"Username and password exists \n");
+      if (ret == 1) printf(KRED"Username or password are incorrect"KNRM "\n");
   }
 
+  free(userI);
+  free(passI);
   fclose(fp);
 }
 
 void boot(int debug){
+  directory = malloc(sizeof(char) * 2560);
+  username = malloc(sizeof(char) * 256);
+  strcpy(directory, "root");
+
   checkFiles(debug);
   inrp(nrp, debug);
   login(debug);

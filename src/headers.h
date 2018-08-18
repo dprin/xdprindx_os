@@ -1,14 +1,16 @@
 #ifndef HEADERS
 #define HEADERS
 
+#include <unistd.h>
+
 #include "./boot.h"
-//#include "./cmds/ca.h"
+#include "./cmds/commands.h"
 
 void run(int debug){
   boot(debug);
-  //while (1 == 1) {
-    //getCommand();
-  //}
+  while (2 == 2){
+    getInput(debug);
+  }
 }
 
 #endif
