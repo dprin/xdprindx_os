@@ -22,5 +22,5 @@ int main(int argc, char* argv[]){
 
   run(debug);
 
-  return -1;
+  return 0x1;
 }

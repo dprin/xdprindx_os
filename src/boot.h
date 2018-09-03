@@ -23,11 +23,11 @@ int nrp = 0; //no root password
 int isAdmin;
 char* directory;
 char* username;
+struct stat sb;
 
 void checkFiles(int debug){
     FILE* file;
     DIR* dir = opendir("root");
-    struct stat sb;
     int result;
 
     if ((file = fopen("usrs", "r"))){ //checking if "usrs" file exists
@@ -42,7 +42,7 @@ void checkFiles(int debug){
     else{
       if((result = mkdir("root", 0777)) == -1){
         printf(KRED"Error: couldn't make directory\n\n"KNRM);
-        exit(1);
+        exit(0x2);
       }
     }
 }
@@ -100,7 +100,7 @@ int cLogin(char* usern, char* password, FILE* fp, int debug){
   }
   buff[n] = '\0'; //end string
 
-  n = 0; //i will user n again later
+  n = 0; //i will use n again later
 
   while(n != strlen(buff)){
     while (buff[n] != '\n'){ //copy every line till it is
@@ -188,7 +188,7 @@ void login(int debug){ //login function
       ret = cLogin(userI, passI, fp, debug);
       if (debug == 1 && ret == 0) printf(KGRN"[DEBUG]: "KNRM"Username/password doesn't exists \n");
       else if (debug == 1 && ret == 1) printf(KGRN"[DEBUG]: "KNRM"Username and password exists \n");
-      if (ret == 1) printf(KRED"Username or password are incorrect"KNRM "\n");
+      if (ret == 0) printf(KRED"Username or password are incorrect"KNRM "\n");
   }
 
   free(userI);
@@ -199,7 +199,7 @@ void login(int debug){ //login function
 void boot(int debug){
   directory = malloc(sizeof(char) * 2560);
   username = malloc(sizeof(char) * 256);
-  strcpy(directory, "root");
+  strcpy(directory, "./root/");
 
   checkFiles(debug);
   inrp(nrp, debug);
