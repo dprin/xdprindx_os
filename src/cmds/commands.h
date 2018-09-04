@@ -5,6 +5,24 @@
 
 int inputSpaces = 0;
 
+char* getCD(char* directory){
+  int i = strlen(directory) - 2, i2 = i, i3 = 0, c;
+  char* CD = malloc(sizeof(char) * 256); //CD = current directory
+
+  for (i2; directory[i2] != '/'; i2--); //puts i2 to the second to last / in directory string
+  i2++; //puts i2 to the first letter after second to last / in directory string
+
+  //copy everything to CD string
+  for (i2; i2 != (i + 1); i2++){
+    c = (int) directory[i2];
+    CD[i3++] = (char) c;
+  }
+
+  CD[i3] = '\0'; //close stg
+
+  return CD; //return CD
+}
+
 char* getCommand(char* input){
   if (inputSpaces == 0) return input; //if there is nothing but the command, just return the command
   char* ret = malloc(sizeof(char) * 257);
@@ -69,7 +87,6 @@ void doCommand(char* input, int debug){
 
   //makedir
   else if ((strcmp(command,"makedir")) == 0 && inputSpaces == 1){
-    printf(KGRN"[DEBUG]: "KNRM"%s \n", getArg(input, 1));
     makedir(getArg(input, 1), debug);
   }
 
@@ -78,21 +95,25 @@ void doCommand(char* input, int debug){
     remdir(getArg(input, 1), debug);
   }
 
+  //cd
+  else if ((strcmp(command, "cd")) == 0 && inputSpaces == 1){
+    cd(getArg(input, 1), debug);
+  }
   else {
     printf("Sorry, command doesn't exist\n");
   }
 
   free(command);
-  free(arg);
 }
 
 void getInput(int debug){
   char* input = malloc(sizeof(char) * 2560);
+  char* CD = malloc(sizeof(char) * 256);
+  CD = getCD(directory);
 
-  //i'll make a function later that can get the current directory
-  //strcpy(cdir,directory); //so it wont be included in this current update
+  getCD(directory);
 
-  printf("%s> ", username);
+  printf("%s@%s> ", username, CD);
   fgets(input,2560, stdin);
 
   //cleaning the input string so that it can be somewhat usable
@@ -116,7 +137,6 @@ void getInput(int debug){
   inputSpaces = 0;
 
   free(input);
-  //free(cdir);
 }
 
 #endif
