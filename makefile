@@ -9,4 +9,3 @@ compile:
 clean:
 	-rm -f ./obj/*.o
 	-rm -rf ./testing/*
-	clear

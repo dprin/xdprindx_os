@@ -37,11 +37,11 @@ void checkFiles(int debug){
     else nrp = 1; //if not thenno root password = 1
 
     if (stat("root", &sb) == 0 && S_ISDIR(sb.st_mode)){
-        if (debug == 1) printf(KGRN"[DEBUG]"KNRM" root exists\n");
+        if (debug == 1) printf(KGRN"[DEBUG]: "KNRM" root exists\n");
     }
     else{
       if((result = mkdir("root", 0777)) == -1){
-        printf(KRED"Error: couldn't make directory\n\n"KNRM);
+        printf(KRED"[ERROR]: "KNRM"Couldn't make directory\n\n");
         exit(0x2);
       }
     }

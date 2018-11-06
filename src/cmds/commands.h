@@ -99,6 +99,13 @@ void doCommand(char* input, int debug){
   else if ((strcmp(command, "cd")) == 0 && inputSpaces == 1){
     cd(getArg(input, 1), debug);
   }
+  //ls
+  else if ((strcmp(command, "ls")) == 0 && inputSpaces == 0){
+    ls(debug);
+  }
+  else if ((strcmp(command, "exit")) == 0 && inputSpaces == 0){
+    exit(0);
+  }
   else {
     printf("Sorry, command doesn't exist\n");
   }

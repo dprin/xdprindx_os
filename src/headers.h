@@ -2,6 +2,7 @@
 #define HEADERS
 
 #include <unistd.h>
+#include <dirent.h>
 
 #include "./boot.h"
 #include "./cmds/commands.h"
