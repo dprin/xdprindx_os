@@ -5,7 +5,7 @@ This is an os that i will be working on in c only. I'll invite a friend to help 
 *This was made with the gcc compiler, make sure that is installed*
 
 **Version**
-0.1.1
+0.1.2
 
 **INSTRUCTIONS**
 
