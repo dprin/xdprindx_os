@@ -1,3 +1,5 @@
+# this is basically dead, although i might revive it in the near future
+
 # xdprindx_os
 This is an os that i will be working on in c only. I'll invite a friend to help me make it.
 
