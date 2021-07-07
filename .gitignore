@@ -1,0 +1,9 @@
+.testing
+.obj
+obj/output.o
+testing/os
+testing/usrs
+.vscode/settings.json
+lol/main.c
+lol/test
+lol/main
