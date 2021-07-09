@@ -21,7 +21,7 @@ char* directory;
 char* username;
 struct stat sb;
 
-void checkFiles(int debug){
+void checkFiles(){
     FILE* file;
     DIR* dir = opendir("root");
     int result;
@@ -43,7 +43,7 @@ void checkFiles(int debug){
     } 
 } 
 
-void inrp(int debug){ //inrp = if no root password
+void inrp(){ //inrp = if no root password
     if (nrp == 1){ //skips all of this function if nrp == 0
         FILE *fp;
         char* rpass = malloc(sizeof(char) * 261); //root password
@@ -52,7 +52,7 @@ void inrp(int debug){ //inrp = if no root password
         printf("Please enter root password that you want: "); fgets(rpass, 261, stdin);
 
         rpass[strlen(rpass) - 1] = '\0'; //remove \n at the end of rpass
-        if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" pass is \"%s\"\n", rpass);
+        if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" pass : \"%s\"\n", rpass);
         if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" will print in file \"root:%s:1\"\n", rpass);
 
         fp = fopen("usrs", "a");
@@ -65,25 +65,24 @@ void inrp(int debug){ //inrp = if no root password
 }
 
 //Compares the login information the user gave with "usrs" file
-int cLogin(char* usern, char* password, FILE* fp, int debug){
+int cLogin(char* usern, char* password, FILE* fp){
     if (fp == NULL) return 0; //exit if nothing in file
 
-    char* tmp; //temporary
+    char* tmp;
     char* line;
     char* file = getFile(fp);
 
     line = strtok_r(file, "\n", &tmp);
     do{
+        printf("%s\n", line);
         if (strcmp(usern, cutstr(line, 0, strlen(usern))) != 0)
             continue;
         if (strcmp(password, cutstr(line, strlen(usern) + 1, strlen(password))) != 0)
             continue;
 
         strcpy(username, usern);
-
         isAdmin = atoi(cutstr(line, strlen(line) - 1, 1));
 
-        free(line);
         return 1;
     } while((line = strtok_r(NULL, "\n", &tmp)) != NULL);
 
@@ -92,7 +91,7 @@ int cLogin(char* usern, char* password, FILE* fp, int debug){
 }
 
 
-void login(int debug){ //login function
+void login(){ //login function
     FILE* fp;
     char* userI = malloc(sizeof(char) * 256); //username input (from user)
     char* passI = malloc(sizeof(char) * 256); //password input (from user)
@@ -109,7 +108,7 @@ void login(int debug){ //login function
         userI[strlen(userI) - 1] = '\0'; //remove \n at end of string
         passI[strlen(passI) - 1] = '\0'; //remove \n at end of string
 
-        ret = cLogin(userI, passI, fp, debug);
+        ret = cLogin(userI, passI, fp);
         if (debug == 1 && ret == 1) printf(KGRN"[DEBUG]: "KNRM"Username and password exists \n");
         if (ret == 0) printf(KRED"Username or password are incorrect"KNRM "\n");
     }
@@ -119,7 +118,7 @@ void login(int debug){ //login function
     fclose(fp);
 }
 
-void boot(int debug){
+void boot(){
     directory = malloc(sizeof(char) * 2560);
     username = malloc(sizeof(char) * 256);
     strcpy(directory, "./root/");

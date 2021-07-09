@@ -6,7 +6,7 @@
 #ifndef UM
 #define UM
 
-void makeusr(char* name, int isAdminTmp, int debug){
+void makeusr(char* name, int isAdminTmp){
     if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"isAdmin= %i\n", isAdminTmp);
 
     if (isAdminTmp != 0 && isAdminTmp != 1){
@@ -31,13 +31,13 @@ void makeusr(char* name, int isAdminTmp, int debug){
     if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"printing: %s:%s:%i\n", name, passtmp, isAdminTmp);
 
     fp = fopen("usrs", "a");
-    fprintf(fp, "\n%s:%s:%i", name, passtmp, isAdminTmp);
+    fprintf(fp, "%s:%s:%i\n", name, passtmp, isAdminTmp);
     fclose(fp);
 
     free(passtmp);
 }
 
-void delusr(char* name, int debug){
+void delusr(char* name){
     if (isAdmin = 0){
         printf(KRED"[ERROR]: You don't have any admin permissions to use this command\n"KNRM);
         return;

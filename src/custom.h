@@ -7,7 +7,6 @@
 
 char* cutstr(char* inp, int startPos, int len){
     char* ret = malloc(sizeof(char) * (len + 1));
-    int c = 0;
 
     for (int i = startPos; i < startPos + len; i++){
         ret[i - startPos] = inp[i];
@@ -18,7 +17,7 @@ char* cutstr(char* inp, int startPos, int len){
 }
 
 char* getFile(FILE* fp){
-    //this finds how big the "usrs" file is
+    //finding size of file
     fseek(fp, 0, SEEK_END);
     long f_size = ftell(fp);
     fseek(fp, 0, SEEK_SET);

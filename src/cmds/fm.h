@@ -4,19 +4,19 @@
 #ifndef FM
 #define FM
 
-void makedir(char* name, int debug){
-    int result;
-    if (stat(name, &sb) == 0 && S_ISDIR(sb.st_mode)){ //checking if directory exists
-        printf(KRED"[ERROR]: "KNRM"directory already exists");
-        return;
-    }
-
+void makedir(char* name){
     //dir will contain the folder that will be made
     char* dir = malloc(strlen(name) + strlen(directory) + 1);
     strcpy(dir, directory);
     strcat(dir, name);
     strcat(dir, "/");
     dir[strlen(directory) + strlen(name) + 1] = '\0';
+    
+    int result;
+    if (stat(dir, &sb) == 0 && S_ISDIR(sb.st_mode)){ //checking if directory exists
+        printf(KRED"[ERROR]: Directory already exists"KNRM);
+        return;
+    }
 
     if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"name = %s \n", name);
     if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"directory = %s \n", dir);
@@ -28,7 +28,7 @@ void makedir(char* name, int debug){
     free(dir);
 }
 
-void remdir(char* name, int debug){
+void remdir(char* name){
     int result;
 
     //dir = directory of file that will be removed
@@ -38,37 +38,38 @@ void remdir(char* name, int debug){
     strcat(dir, "/");
     dir[strlen(directory) + strlen(name) + 1] = '\0';
 
-    if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"%s\n", dir);
+    if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"directory = %s\n", dir);
 
     if((rmdir(dir)) == -1) printf(KRED"[ERROR]: "KNRM"Could not delete directory\n");
 
-    if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"%s\n", name);
+    if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"name = %s\n", name);
 
     free(dir);
 }
 
-void makefile(char* name, int debug){
+void makefile(char* name){
     char* dir = malloc(strlen(name) + strlen(directory));
     strcpy(dir, directory);
     strcat(dir, name);
     dir[strlen(directory) + strlen(name) + 1] = '\0';
 
-    if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"%s\n", dir);
+    if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"directory = %s\n", dir);
 
     FILE* fp;
     fp = fopen(dir, "a");
     fclose(fp);
 } 
 
-void remfile(char* name, int debug){
+void remfile(char* name){
     //dir = directory of file that will be removed
-    char* dir = malloc(strlen(name) + strlen(directory));
+    char* dir = malloc(strlen(name) + strlen(directory) + 1);
     strcpy(dir, directory);
     strcat(dir, name);
     dir[strlen(directory) + strlen(name) + 1] = '\0';
 
-    FILE* fp;
+    if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"directory = %s\n", dir);
 
+    FILE* fp;
     if (!(fp = fopen(dir, "r"))){
         printf(KRED"[ERROR]: Could not find file.\n\n"KNRM);
         return;
@@ -77,14 +78,13 @@ void remfile(char* name, int debug){
     if ((remove(dir))){
         printf(KRED"[ERROR]: Could not remove file.\n\n"KNRM);
     }
-    return;
 }
 
-void cd(char* name, int debug){
+void cd(char* name){
     if ((strcmp(name, "..")) == 0){ //if argument pushed was ".." then go back in directory
         //so that the program doesn't cause a segmentation fault
         if ((strcmp(directory, "./root/")) == 0){
-            printf(KRED"[ERROR]: "KNRM"Can not go back (you are in the root directory)\n");
+            printf(KRED"[ERROR]: Can not go back (you are in the root directory)\n"KNRM);
         }
         else {
             int i = strlen(directory) - 2; //go behind the last / in directory string
@@ -110,7 +110,7 @@ void cd(char* name, int debug){
             if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"directory = %s\n", directory);
         }
         else {
-            printf(KRED"[ERROR]: "KNRM"Directory doesn't exist\n");
+            printf(KRED"[ERROR]: Directory doesn't exist\n"KNRM);
         }
         free(path);
         closedir(dir);
@@ -119,7 +119,7 @@ void cd(char* name, int debug){
 
 //this code is a slightly modified version of gnu's example:
 //https://www.gnu.org/software/libc/manual/html_node/Simple-Directory-Lister.html
-void ls(int debug){
+void ls(){
     DIR* dir = opendir(directory);
     char* path;
     struct dirent *ep;
@@ -131,7 +131,7 @@ void ls(int debug){
             strcat(path, ep -> d_name);
             strcat(path, "\0");
 
-            if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"path: %s\n", path); //for debug to check what path string is
+            if (debug == 1) printf(KGRN"[DEBUG]: "KNRM"path = %s\n", path); //for debug to check what path string is
 
             //put file/folder in the struct stat sb (located in boot.h)
             stat(path, &sb);
@@ -146,7 +146,7 @@ void ls(int debug){
         }
     }
     else {
-      printf(KRED"[ERROR]: "KNRM"Can not find any folders/files"); //if error
+      printf(KRED"[ERROR]: Can not find any folders/files"KNRM); //if error
     }
     //free allocated memory
     free(path);

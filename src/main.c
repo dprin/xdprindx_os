@@ -1,7 +1,6 @@
 #include "./headers.h"
 
 int main(int argc, char* argv[]){
-  int debug;
 
   //for debug mode (will make it look better later if i can)
   if (argc == 1) debug = 0;

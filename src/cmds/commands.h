@@ -7,64 +7,42 @@
 int inputSpaces = 0;
 int exitLoop = 0;
 
-char* getCD(char* directory){
-    int i = strlen(directory) - 2, i2 = i, i3 = 0, c;
-    char* CD = malloc(sizeof(char) * 256); //CD = current directory
+char* getCD(){
+    long i;
+    for (i = strlen(directory) - 1; directory[i - 1] != '/'; i--);
 
-    for (i2; directory[i2] != '/'; i2--); //puts i2 to the second to last / in directory string
-    i2++; //puts i2 to the first letter after second to last / in directory string
-
-    //copy everything to CD string
-    for (i2; i2 != (i + 1); i2++){
-        c = (int) directory[i2];
-        CD[i3++] = (char) c;
-    }
-
-    CD[i3] = '\0'; //close stg
-
-    return CD; //return CD
-} 
+    return cutstr(directory, i, strlen(directory) - i - 1);
+}
 
 char* getCommand(char* input){
-    if (inputSpaces == 0) return input; //if there is nothing but the command, just return the command
-    char* ret = malloc(sizeof(char) * 257);
-    int i, c;
+    if (inputSpaces == 0) return input;
 
-    for (i = 0; input[i] != ' '; i++) { //go through input and put everything until the first space to ret
-        c = (int) input[i];
-        ret[i] = (char) c;
-    }
+    long i;
+    for (i = 0; input[i] != ' '; i++);
 
-    ret[i] = '\0'; //close the string
-
-    return ret; //return ret
+    return cutstr(input, 0, i);
 }
 
-//if this command is called there will be an argument for sure, so there's no need to add a failsafe
 char* getArg(char* input, int arg){
-    char* ret = malloc(sizeof(char) * 256);
-    int spaceC = 0, i, i2 = 0, c; //spaceC = space count, c = character
+    int spaceC = 0, i, sog; //sog = start of argument
 
     for (i = 0; i != strlen(input); i++){
-        if (spaceC == arg){
-            c = (int) input[i];
-            ret[i2++] = (char) c;
+        if (input[i] == ' '){
+            spaceC++;
+            if (spaceC == arg){
+                sog = i + 1;
+                printf("sog: %i\n", sog);
+            }
+            if (spaceC == arg + 1)
+                break;
         }
-
-        if (input[i] == ' ') spaceC++; //increment spaceC if there is a space
     }
+    if (debug == 1) printf(KGRN"[DEBUG]:"KNRM" arg: %s\n", cutstr(input, sog, i - sog));
 
-    //copied this again because if the argument is at the end of input, it wont get last character
-    if (spaceC == arg){
-        c = (int) input[i];
-        ret[i2++] = (char) c;
-    }
-
-    ret[i2 - 1] = '\0'; //end string
-    return ret; //return ret
+    return cutstr(input, sog, i - sog);
 }
 
-void doCommand(char* input, int debug){
+void doCommand(char* input){
     char* command = malloc(sizeof(char) * 257);
     strcpy(command, getCommand(input));
 
@@ -89,42 +67,42 @@ void doCommand(char* input, int debug){
 
     //makedir
     else if ((strcmp(command,"makedir")) == 0 && inputSpaces == 1){
-        makedir(getArg(input, 1), debug);
+        makedir(getArg(input, 1));
     }
 
     //remdir
     else if ((strcmp(command, "remdir")) == 0 && inputSpaces == 1){
-        remdir(getArg(input, 1), debug);
+        remdir(getArg(input, 1));
     }
 
     //makefile
     else if ((strcmp(command, "makefile")) == 0 && inputSpaces == 1){
-        makefile(getArg(input, 1), debug);
+        makefile(getArg(input, 1));
     }
 
     //remfile
     else if ((strcmp(command, "remfile")) == 0 && inputSpaces == 1){
-        remfile(getArg(input, 1), debug);
+        remfile(getArg(input, 1));
     }
 
     //cd
     else if ((strcmp(command, "cd")) == 0 && inputSpaces == 1){
-        cd(getArg(input, 1), debug);
+        cd(getArg(input, 1));
     }
 
     //ls
     else if ((strcmp(command, "ls")) == 0 && inputSpaces == 0){
-        ls(debug);
+        ls();
     }
 
     //makeusr
     else if ((strcmp(command, "makeusr")) == 0 && inputSpaces == 2){
-        makeusr(getArg(input, 1), atoi(getArg(input, 2)), debug);
+        makeusr(getArg(input, 1), atoi(getArg(input, 2)));
     }
 
     //delusr
     else if ((strcmp(command, "delusr")) == 0 && inputSpaces == 1){
-        delusr(getArg(input, 1), debug);
+        delusr(getArg(input, 1));
     }
 
     //exit
@@ -139,12 +117,9 @@ void doCommand(char* input, int debug){
     free(command);
 }
 
-void getInput(int debug){
+void getInput(){
     char* input = malloc(sizeof(char) * 2560);
-    char* CD = malloc(sizeof(char) * 256);
-    CD = getCD(directory);
-
-    getCD(directory);
+    char* CD = getCD(directory);
 
     printf("%s@%s> ", username, CD);
     fgets(input,2560, stdin);
@@ -165,8 +140,7 @@ void getInput(int debug){
         if (input[i] == ' ')
             inputSpaces++;
 
-    doCommand(input, debug);
-
+    doCommand(input);
     inputSpaces = 0;
 
     free(input);
