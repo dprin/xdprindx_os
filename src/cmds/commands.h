@@ -29,10 +29,8 @@ char* getArg(char* input, int arg){
     for (i = 0; i != strlen(input); i++){
         if (input[i] == ' '){
             spaceC++;
-            if (spaceC == arg){
+            if (spaceC == arg)
                 sog = i + 1;
-                printf("sog: %i\n", sog);
-            }
             if (spaceC == arg + 1)
                 break;
         }

@@ -74,7 +74,6 @@ int cLogin(char* usern, char* password, FILE* fp){
 
     line = strtok_r(file, "\n", &tmp);
     do{
-        printf("%s\n", line);
         if (strcmp(usern, cutstr(line, 0, strlen(usern))) != 0)
             continue;
         if (strcmp(password, cutstr(line, strlen(usern) + 1, strlen(password))) != 0)
